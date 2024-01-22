@@ -1,27 +1,28 @@
-public class Main {
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.stage.Stage;
+import Player.*;
+
+public class Main extends Application {
+
+    @Override
+    public void start(Stage primaryStage) {
+        Pane gamePane = new Pane();
+        Player player = new Player(gamePane);
+
+        Scene scene = new Scene(gamePane, 300, 300);
+        primaryStage.setTitle("Déplacement fluide du Joueur");
+        scene.setFill(Color.DARKGRAY);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
+        gamePane.requestFocus(); // Important pour capturer les événements clavier
+    }
+
     public static void main(String[] args) {
-
-        // Création du personnage joueur
-        Character player = new Character("Survivor", 100, 100, 0, null, null, null);
-
-        // Initialisation de quelques ressources
-        Resource water = new Resource("Water", 10);
-        Resource food = new Resource("Food", 5);
-
-        // Initialisation de quelques outils
-        Tool axe = new Tool("Axe", 50, 0);
-        Tool fishingRod = new Tool("Fishing Rod", 30, 0);
-
-        // Initialisation de quelques dangers
-        Danger wildAnimal = new Danger("Wild Animal", null, 70, 0);
-        Danger storm = new Danger("Storm", null, 50, 0);
-
-        // Logique pour démarrer le jeu
-        // Par exemple, afficher un message de bienvenue, les instructions du jeu, etc.
-        System.out.println("Welcome to the Survival Game!");
-        System.out.println("Try to survive as long as you can.");
-
-        player.collectResource(food);
-        player.toString();
+        launch(args);
     }
 }
