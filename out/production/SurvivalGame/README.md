@@ -8,8 +8,8 @@
 ## Classes
 ### Les classes de bases
 - `Character` : Classe abstraite représentant un personnage. Elle contient les attributs et méthodes communs à tous les personnages.
-- `Tool` : Classe abstraite représentant un outil. Elle contient les attributs et méthodes communs à tous les outils.
-- `Resource` : Classe abstraite représentant une ressource. Elle contient les attributs et méthodes communs à toutes les ressources.
+- `Item.Tool` : Classe abstraite représentant un outil. Elle contient les attributs et méthodes communs à tous les outils.
+- `Item.Resource` : Classe abstraite représentant une ressource. Elle contient les attributs et méthodes communs à toutes les ressources.
 - `Danger` : Classe abstraite représentant un danger. Elle contient les attributs et méthodes communs à tous les dangers.
 
 ## Héritage

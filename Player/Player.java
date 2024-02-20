@@ -1,5 +1,8 @@
 package Player;
 
+import Event.Event;
+import Event.EventHandler;
+import Game.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Rectangle2D;
@@ -10,14 +13,20 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import static Game.Main.WINDOW_DIMENSION_HEIGHT;
+import static Game.Main.WINDOW_DIMENSION_WIDTH;
 
 public class Player {
     private Pane gamePane; // Reference to the gamePane for camera movement
 
+    private final double SPEED_COEFFICIENT = 10;
     private final int spriteWidth = 64;
     private final int spriteHeight = 64;
 
@@ -36,15 +45,23 @@ public class Player {
     private int currentFrame = 0; // Keep track of the current frame
     private int numRows = 2; // Number of rows in your spritesheet
     private int numCols = 6; // Number of columns in your spritesheet
-
     private Image spritesheet;
     private ImageView spriteView;
     private final Set<KeyCode> keysPressed = new HashSet<>();
 
-    public Player(Pane gamePane) {
+    private EventHandler eventHandler; // Single instance of EventHandler
+    private List<Event> eventList;
+    private Stage primaryStage;
+
+    public Player(Pane gamePane, List<Event> eventList, Stage primaryStage) {
         this.gamePane = gamePane;
+        this.eventList = eventList;
+        this.primaryStage = primaryStage;
         setupPlayer();
         gamePane.getChildren().add(spriteView);
+
+        // Initialize the EventHandler
+        eventHandler = new EventHandler(eventList, gamePane);
 
         gamePane.setOnKeyPressed(e -> keysPressed.add(e.getCode()));
         gamePane.setOnKeyReleased(e -> keysPressed.remove(e.getCode()));
@@ -75,6 +92,7 @@ public class Player {
     }
 
     private void setupPlayer() {
+
         spritesheet = new Image(FRONT_MOVEMENT);
 
         int scale = 3;
@@ -105,55 +123,105 @@ public class Player {
     }
 
     private void move() {
+        if(EventHandler.isAlertDisplayed){
+            keysPressed.clear();
+            return;
+        }
+
         double dx = 0;
         double dy = 0;
-        double speed = 1;
 
         boolean wasMoving = isMoving;
         int previousOrientation = lastOrientation;
 
         // Movement logic
         if (keysPressed.contains(KeyCode.UP)) {
-            dy -= speed;
+            dy -= SPEED_COEFFICIENT;
             lastOrientation = 0; // Up
         }
         if (keysPressed.contains(KeyCode.DOWN)) {
-            dy += speed;
+            dy += SPEED_COEFFICIENT;
             lastOrientation = 2; // Down
         }
         if (keysPressed.contains(KeyCode.LEFT)) {
-            dx -= speed;
+            dx -= SPEED_COEFFICIENT;
             lastOrientation = -1; // Left
         }
         if (keysPressed.contains(KeyCode.RIGHT)) {
-            dx += speed;
+            dx += SPEED_COEFFICIENT;
             lastOrientation = 1; // Right
         }
 
         // Normalize the movement vector if diagonal movement is detected
         if (dx != 0 && dy != 0) {
             double length = Math.sqrt(dx * dx + dy * dy);
-            dx = dx / length * speed;
-            dy = dy / length * speed;
+            dx = dx / length * SPEED_COEFFICIENT;
+            dy = dy / length * SPEED_COEFFICIENT;
         }
 
         isMoving = dx != 0 || dy != 0;
+
+        // Calculate new player position
+        double newX = spriteView.getX() + dx;
+        double newY = spriteView.getY() + dy;
+
+        // Enforce boundary limits
+        double xmin = 200;
+        double ymin = 154;
+        double xmax = 5792;
+        double ymax = 5792;
+
+        // Clamp the new position within the limits
+        newX = Math.max(xmin, Math.min(xmax, newX));
+        newY = Math.max(ymin, Math.min(ymax, newY));
+
+        // Update player's position
+        spriteView.setX(newX);
+        spriteView.setY(newY);
 
         // Change sprite sheet if necessary
         if (wasMoving != isMoving || previousOrientation != lastOrientation) {
             updateSpriteSheet();
         }
 
-        spriteView.setX(spriteView.getX() + dx);
-        spriteView.setY(spriteView.getY() + dy);
+        // Update the EventHandler's player position
+        eventHandler.setPlayerPosition(newX, newY);
+
+        // Handle events
+        eventHandler.handleEvent();
+
     }
 
-    private void updateCameraPosition() {
-        double offsetX = gamePane.getWidth() / 2 - spriteView.getX() - spriteWidth / 2;
-        double offsetY = gamePane.getHeight() / 2 - spriteView.getY() - spriteHeight / 2;
+    public void updateCameraPosition() {
+        double xStartRangeMax;
+        double xEndRangeMax;
+        double yStartRangeMax;
+        double yEndRangeMax;
 
-        gamePane.setTranslateX(offsetX);
-        gamePane.setTranslateY(offsetY);
+        if (primaryStage.getWidth() >1100 && primaryStage.getHeight() > 760) {
+            // Adjust max values for full-screen mode
+            xStartRangeMax = 950;
+            xEndRangeMax = 5100;
+            yStartRangeMax = 500;
+            yEndRangeMax = 5500;
+        } else {
+            // Default max values for non-full-screen mode
+            xStartRangeMax = 750;
+            xEndRangeMax = 5320;
+            yStartRangeMax = 500;
+            yEndRangeMax = 5500;
+        }
+
+        double offsetX = gamePane.getWidth() / 2 - spriteView.getX() - spriteWidth;
+        double offsetY = gamePane.getHeight() / 2 - spriteView.getY() - spriteHeight;
+
+        if (spriteView.getX() > xStartRangeMax && spriteView.getX() < xEndRangeMax) {
+            gamePane.setTranslateX(offsetX);
+        }
+
+        if (spriteView.getY() > yStartRangeMax && spriteView.getY() < yEndRangeMax) {
+            gamePane.setTranslateY(offsetY);
+        }
     }
 
     private void updateSpriteSheet() {
@@ -248,6 +316,14 @@ public class Player {
                 spriteView.setScaleX(1);
             }
         }
+    }
+
+    public int getSpriteWidth() {
+        return spriteWidth;
+    }
+
+    public int getSpriteHeight() {
+        return spriteHeight;
     }
 
 }
