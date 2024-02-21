@@ -77,7 +77,7 @@ public class Event {
                 "x=" + x +
                 ", y=" + y +
                 ", type='" + type + '\'' +
-                ", imageView=" + imageView +
+                ", imageView=" + imageView.toString() +
                 ", eventType=" + eventType.getName()+
                 '}';
     }

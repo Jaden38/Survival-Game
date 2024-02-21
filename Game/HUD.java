@@ -83,7 +83,8 @@ public class HUD extends BorderPane {
         healthLabelValue.setText(String.valueOf(character.getHealth()));
         hungerLabelValue.setText(String.valueOf(character.getHunger()));
         thirstLabelValue.setText(String.valueOf(character.getThirst()));
-        xpBar.setProgress(character.getExperience() / MAX_EXPERIENCE); // Set the progress based on character's experience
+        xpBar.setProgress(character.getExperience() / MAX_EXPERIENCE);
+        handleXPBar();
 
 
     }
@@ -198,5 +199,19 @@ public class HUD extends BorderPane {
                 updateLabels();
             });
         }, 0, 300, TimeUnit.MILLISECONDS); // Update timer every 60 seconds
+    }
+
+    private void handleXPBar() {
+        // Check if XP bar is full
+        if (xpBar.getProgress() >= 1.0) {
+            // Level up the character
+            character.setLevel(character.getLevel() + 1);
+            // Calculate additional XP beyond the maximum
+            double additionalXP = character.getExperience() - MAX_EXPERIENCE;
+            // Reset XP to the additional XP
+            character.setExperience(additionalXP);
+            // Update labels
+            updateLabels();
+        }
     }
 }

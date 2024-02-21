@@ -61,7 +61,7 @@ public class Player {
         gamePane.getChildren().add(spriteView);
 
         // Initialize the EventHandler
-        eventHandler = new EventHandler(eventList, gamePane, character);
+        eventHandler = new EventHandler(eventList, gamePane, character, getSpriteView());
 
         gamePane.setOnKeyPressed(e -> keysPressed.add(e.getCode()));
         gamePane.setOnKeyReleased(e -> keysPressed.remove(e.getCode()));

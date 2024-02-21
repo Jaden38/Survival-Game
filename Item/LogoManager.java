@@ -11,7 +11,7 @@ public class LogoManager {
 
     static {
         // Load logo images and associate them with names
-//        logoMap.put("Gold", new ImageView(new Image("/resources/Logo/gold_logo.gif")));
+        logoMap.put("Gold", new ImageView(new Image("/resources/Logo/gold_logo.gif")));
 //        logoMap.put("Iron", new ImageView(new Image("/resources/Logo/iron_logo.gif")));
         logoMap.put("Wood", new ImageView(new Image("/resources/Logo/wood_logo.gif")));
 //        logoMap.put("Food", new ImageView(new Image("/resources/Logo/food_logo.gif")));
