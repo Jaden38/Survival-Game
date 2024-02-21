@@ -5,23 +5,32 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class HUD extends BorderPane {
+    private int MAX_EXPERIENCE=300;
     private Character character;
+    private Scene scene;
     private GameTime gameTime;
+    private ProgressBar xpBar;
 
+    private Label levelLabelPrefix;
     private Label nameLabelPrefix;
     private Label healthLabelPrefix;
     private Label hungerLabelPrefix;
     private Label thirstLabelPrefix;
+    private Label levelLabelValue;
+
     private Label nameLabelValue;
     private Label healthLabelValue;
     private Label hungerLabelValue;
@@ -30,9 +39,11 @@ public class HUD extends BorderPane {
     private ScheduledExecutorService scheduler;
 
 
-    public HUD(Character character) {
+    public HUD(Character character, Scene scene) {
         this.character = character;
+        this.scene = scene;
         this.gameTime = new GameTime();
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/Game/bar.css")).toExternalForm());
         initializeLabels();
         setLabelsStyle();
         setLayout();
@@ -41,40 +52,52 @@ public class HUD extends BorderPane {
     }
 
     private void initializeLabels() {
+        levelLabelPrefix = new Label();
         nameLabelPrefix = new Label();
         healthLabelPrefix = new Label();
         hungerLabelPrefix = new Label();
         thirstLabelPrefix = new Label();
         timeLabel = new Label();
 
+        levelLabelValue= new Label();
         nameLabelValue = new Label();
         healthLabelValue = new Label();
         hungerLabelValue = new Label();
         thirstLabelValue = new Label();
+
+        xpBar = new ProgressBar();
+        xpBar.setProgress(character.getExperience() / MAX_EXPERIENCE); // Set the progress based on character's experience
         updateLabels();
     }
 
     private void updateLabels() {
+        levelLabelPrefix.setText("Lv: ");
         nameLabelPrefix.setText("Name: ");
         healthLabelPrefix.setText("Health: ");
         hungerLabelPrefix.setText("Hunger: ");
         thirstLabelPrefix.setText("Thirst: ");
         timeLabel.setText(gameTime.getTimeString());
 
+        levelLabelValue.setText(String.valueOf(character.getLevel()));
         nameLabelValue.setText(character.getName());
         healthLabelValue.setText(String.valueOf(character.getHealth()));
         hungerLabelValue.setText(String.valueOf(character.getHunger()));
         thirstLabelValue.setText(String.valueOf(character.getThirst()));
+        xpBar.setProgress(character.getExperience() / MAX_EXPERIENCE); // Set the progress based on character's experience
+
 
     }
 
     private void setLabelsStyle() {
         Font gameFont = Font.loadFont(getClass().getResourceAsStream("/lib/Fonts/SuperLegendBoy-4w8Y.ttf"), 16);
         // Apply the font to labels
+        levelLabelPrefix.setFont(gameFont);
         nameLabelPrefix.setFont(gameFont);
         healthLabelPrefix.setFont(gameFont);
         hungerLabelPrefix.setFont(gameFont);
         thirstLabelPrefix.setFont(gameFont);
+
+        levelLabelValue.setFont(gameFont);
         nameLabelValue.setFont(gameFont);
         healthLabelValue.setFont(gameFont);
         hungerLabelValue.setFont(gameFont);
@@ -83,6 +106,7 @@ public class HUD extends BorderPane {
 
 
         // Set font color to white
+        levelLabelPrefix.setTextFill(Color.WHITE);
         nameLabelPrefix.setTextFill(Color.WHITE);
         healthLabelPrefix.setTextFill(Color.WHITE);
         hungerLabelPrefix.setTextFill(Color.WHITE);
@@ -90,24 +114,22 @@ public class HUD extends BorderPane {
         timeLabel.setTextFill(Color.WHITE);
 
 
+        levelLabelValue.setTextFill(Color.WHITE);
         nameLabelValue.setTextFill(Color.WHITE);
-        if(Integer.parseInt(healthLabelValue.getText()) > 50){
+        if (Integer.parseInt(healthLabelValue.getText()) > 50) {
             healthLabelValue.setTextFill(Color.GREEN);
-        }
-        else{
+        } else {
             healthLabelValue.setTextFill(Color.RED);
         }
-        if(Integer.parseInt(hungerLabelValue.getText()) > 50){
+        if (Integer.parseInt(hungerLabelValue.getText()) > 50) {
             hungerLabelValue.setTextFill(Color.GREEN);
-        }
-        else{
+        } else {
             hungerLabelValue.setTextFill(Color.RED);
         }
 
-        if(Integer.parseInt(thirstLabelValue.getText()) > 50){
+        if (Integer.parseInt(thirstLabelValue.getText()) > 50) {
             thirstLabelValue.setTextFill(Color.GREEN);
-        }
-        else{
+        } else {
             thirstLabelValue.setTextFill(Color.RED);
         }
 
@@ -115,6 +137,9 @@ public class HUD extends BorderPane {
     }
 
     private void setLayout() {
+        HBox levelBox = new HBox();
+        levelBox.getChildren().addAll(levelLabelPrefix, levelLabelValue);
+
         HBox nameBox = new HBox();
         nameBox.getChildren().addAll(nameLabelPrefix, nameLabelValue);
 
@@ -130,13 +155,13 @@ public class HUD extends BorderPane {
         // Add spacing between the groups
         int groupSpacing = 20;
 
-        HBox nameAndDataBox = new HBox(nameBox, new Pane(), healthBox, new Pane(), hungerBox, new Pane(), thirstBox);
+        HBox nameAndDataBox = new HBox(levelBox,  new Pane(), nameBox, new Pane(), healthBox, new Pane(), hungerBox, new Pane(), thirstBox);
         nameAndDataBox.setPadding(new Insets(10));
         nameAndDataBox.setSpacing(groupSpacing);
 
         HBox timerBox = new HBox(timeLabel);
         timerBox.setPadding(new Insets(10));
-            timeLabel.setStyle("-fx-text-alignment: right;");
+        timeLabel.setStyle("-fx-text-alignment: right;");
 
         Region filler = new Region();
         HBox.setHgrow(filler, Priority.ALWAYS);
@@ -147,6 +172,20 @@ public class HUD extends BorderPane {
         topBox.setAlignment(Pos.CENTER_LEFT);
 
         setTop(topBox);
+
+        xpBar.getStyleClass().add("xp-bar");
+        xpBar.getStyleClass().add("progress-bar");
+        xpBar.prefWidthProperty().bind(scene.widthProperty());
+
+        // Add the XP bar to the layout
+        HBox xpBarBox = new HBox(xpBar);
+        xpBarBox.setAlignment(Pos.CENTER);
+//        xpBarBox.setPadding(new Insets(10));
+
+        xpBarBox.setMaxWidth(Double.MAX_VALUE);
+        xpBarBox.setStyle("-fx-background-color: #333333;"); // Set background color
+
+        setBottom(xpBarBox);
 
     }
 

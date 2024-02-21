@@ -1,9 +1,11 @@
 package Event;
 
 import Item.Danger;
+import Item.DataLists;
 import Item.LogoManager;
 import Item.Resource;
 import Player.Player;
+import Player.Character;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -15,14 +17,16 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EventHandler {
 
     private Player player;
+    private Character character;
     private final List<Event> eventList;
     private double playerX;
     private double playerY;
@@ -35,9 +39,10 @@ public class EventHandler {
 
     // Constructor
 
-    public EventHandler(List<Event> eventList, Pane gamePane) {
+    public EventHandler(List<Event> eventList, Pane gamePane, Character character) {
         this.eventList = eventList;
         this.gamePane = gamePane;
+        this.character = character;
     }
 
     public void handleEvent() {
@@ -80,8 +85,10 @@ public class EventHandler {
         // Set the flag to true since an alert window is being displayed
         isAlertDisplayed = true;
 
+
         // Create and show the event message on the JavaFX Application Thread
         Platform.runLater(() -> {
+            boolean isMonster = false;
             Font gameFont = Font.loadFont(getClass().getResourceAsStream("file:lib/Fonts/SuperLegendBoy-4w8Y.ttf"), 16);
             // Create a custom alert window to display the event information
             Alert alert = new Alert(Alert.AlertType.NONE);
@@ -109,6 +116,7 @@ public class EventHandler {
                 content.getChildren().addAll(logoLabel, quantityLabel);
 
             } else if (event.getEventType() instanceof Danger danger) {
+                isMonster = true;
 
                 ImageView logo = LogoManager.getLogo(danger.getName());
                 Label logoLabel = new Label();
@@ -120,8 +128,12 @@ public class EventHandler {
 
                 Label damageLabel = new Label("Damage: " + danger.getDamage());
                 damageLabel.setStyle("-fx-font-size: 14;");
+
+                Label experienceLabel = new Label("XP: " + danger.getExperience());
+                experienceLabel.setStyle("-fx-font-size: 14;");
+
                 damageLabel.setFont(gameFont);
-                content.getChildren().addAll(logoLabel, quantityLabel, damageLabel);
+                content.getChildren().addAll(logoLabel, quantityLabel, damageLabel, experienceLabel);
             }
 
             // Set background color and padding for the VBox
@@ -129,8 +141,10 @@ public class EventHandler {
 
             alert.getDialogPane().setContent(content);
             // Create buttons for deleting the event/GIF and for closing without deleting
-            ButtonType deleteButtonType = new ButtonType("Delete Event", ButtonBar.ButtonData.OK_DONE);
-            ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+            String okButtonText = isMonster ? "Fight" : "Collect";
+            String cancelButtonText= isMonster ? "Run" : "Leave";
+            ButtonType deleteButtonType = new ButtonType(okButtonText, ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancelButtonType = new ButtonType(cancelButtonText, ButtonBar.ButtonData.CANCEL_CLOSE);
 
             // Set the buttons
             alert.getButtonTypes().setAll(deleteButtonType, cancelButtonType);
@@ -141,15 +155,30 @@ public class EventHandler {
             // Set a callback for when the alert window is closed
             alert.setOnCloseRequest(closeEvent -> {
                 // Set the flag back to false since the alert window is closed
+                ImageView logoView = LogoManager.getLogo(event.getEventType().getName());
+                if (logoView != null) {
+                    gamePane.getChildren().remove(event.imageView);
+                    logoView.setX(event.getX());
+                    logoView.setY(event.getY());
+                    gamePane.getChildren().add(logoView);
+                }
                 isAlertDisplayed = false;
             });
 
+            // Show the alert window and wait for the user's response
             // Show the alert window and wait for the user's response
             Optional<ButtonType> result = alert.showAndWait();
 
             // Handle the user's response
             result.ifPresent(buttonType -> {
                 if (buttonType == deleteButtonType) {
+                    if (event.getEventType() instanceof Danger danger) {
+
+                        double playerXp = character.getExperience();
+                        double monsterXp = danger.getExperience();
+                        character.setExperience(playerXp + monsterXp);
+                    }
+
                     // Remove the event's GIF from the gamePane
                     gamePane.getChildren().remove(event.imageView);
                     // Remove the event from the event list

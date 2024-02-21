@@ -10,6 +10,8 @@ public class Event {
     public ImageView imageView;
     private EventType eventType;
 
+    private boolean hasAlreadyVisited;
+
 
     public Event(double x, double y, String type, ImageView imageView, EventType eventType) {
         this.x = x;
@@ -17,6 +19,7 @@ public class Event {
         this.type = type;
         this.imageView = imageView;
         this.eventType = eventType;
+        this.hasAlreadyVisited=false;
     }
 
 
@@ -50,6 +53,22 @@ public class Event {
 
     public void setEventType(EventType eventType) {
         this.eventType = eventType;
+    }
+
+    public ImageView getImageView() {
+        return imageView;
+    }
+
+    public void setImageView(ImageView imageView) {
+        this.imageView = imageView;
+    }
+
+    public boolean isHasAlreadyVisited() {
+        return hasAlreadyVisited;
+    }
+
+    public void setHasAlreadyVisited(boolean hasAlreadyVisited) {
+        this.hasAlreadyVisited = hasAlreadyVisited;
     }
 
     @Override

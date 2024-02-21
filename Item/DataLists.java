@@ -22,4 +22,6 @@ public class DataLists {
 
     // List of possible danger damages
     public static final List<Integer> dangerDamages = Arrays.asList(10, 20, 30, 40, 50, 60);
+
+    public static final List<Integer> dangerXp = Arrays.asList(5,10,15,20,25,30);
 }

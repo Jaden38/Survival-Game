@@ -2,11 +2,12 @@ package Item;
 
 import Event.EventType;
 
+import java.util.Random;
+
 /**
- * Danger class describes the different kinds of dangers that can be found in the game.
+ * Danger class describes the different kinds of dangers that can be found in the    game.
  */
 public class Danger extends EventType {
-
     /**
      * danger name
      */
@@ -25,6 +26,8 @@ public class Danger extends EventType {
      */
     private int damage;
 
+    private double experience;
+
     /**
      * Constructor for Danger class
      *
@@ -36,8 +39,9 @@ public class Danger extends EventType {
     public Danger(String name, String description, int quantity, int damage) {
         this.name = name;
         this.description = description;
-        this.quantity=quantity;
+        this.quantity = quantity;
         this.damage = damage;
+        setExperience();
     }
 
     // Getters and setters
@@ -74,6 +78,15 @@ public class Danger extends EventType {
     @Override
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public double getExperience() {
+        return experience;
+    }
+
+    public void setExperience() {
+        Random random = new Random();
+        this.experience = DataLists.dangerXp.get(random.nextInt(DataLists.dangerXp.size())) * getQuantity();
     }
 
     @Override

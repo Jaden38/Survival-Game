@@ -1,0 +1,10 @@
+.xp-bar .bar {
+    -fx-background-color: #FF8911; /* Change the color of the XP bar */
+}
+
+.xp-bar .track {
+    -fx-background-color: #666666; /* Change the color of the XP bar track */
+}
+.progress-bar {
+    -fx-pref-height: 10px; /* Set the preferred height of the progress bar */
+}

@@ -9,6 +9,10 @@ import Item.Tool;
  */
 public class Character {
 
+    private int level;
+
+    private double experience;
+
     /**
      * character name
      */
@@ -39,14 +43,12 @@ public class Character {
      */
     private Resource[] resources;
 
-    /**
-     * character dangers
-     */
-    private Danger[] dangers;
 
     /**
      * Constructor for Character class
      *
+     * @param level
+     * @param experience
      * @param name
      * @param health
      * @param hunger
@@ -59,6 +61,8 @@ public class Character {
                      int health,
                      int hunger,
                      int thirst) {
+        this.level=1;
+        this.experience=0;
         this.name = name;
         this.health = health;
         this.hunger = hunger;
@@ -88,10 +92,6 @@ public class Character {
 
     public Resource[] getResources() {
         return resources;
-    }
-
-    public Danger[] getDangers() {
-        return dangers;
     }
 
     public void setName(String name) {
@@ -130,10 +130,6 @@ public class Character {
         this.resources = resources;
     }
 
-    public void setDangers(Danger[] dangers) {
-        this.dangers = dangers;
-    }
-
 
     // Methods to interact with tne environment
 
@@ -165,6 +161,22 @@ public class Character {
         this.health -= danger.getDamage();
     }
 
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public double getExperience() {
+        return experience;
+    }
+
+    public void setExperience(double experience) {
+        this.experience = experience;
+    }
+
     /**
      * Display the character's status
      */
@@ -174,7 +186,6 @@ public class Character {
                 "Hunger: " + hunger + "\n" +
                 "Thirst: " + thirst + "\n" +
                 "Tools: " + tools + "\n" +
-                "Resources: " + resources + "\n" +
-                "Dangers: " + dangers + "\n";
+                "Resources: " + resources;
     }
 }

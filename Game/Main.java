@@ -41,10 +41,10 @@ public class Main extends Application {
         gamePane = new Pane();
         // Add gamePane to the root
         root.getChildren().add(gamePane);
-
+        Scene scene = new Scene(root, WINDOW_DIMENSION_WIDTH, WINDOW_DIMENSION_HEIGHT);
         // Create the character and HUD
         Character character = new Character("Player", 1000, 50, 100);
-        HUD hud = new HUD(character);
+        HUD hud = new HUD(character, scene);
 //        hud.setPrefWidth(200); // Adjust width as needed
 //        hud.setTranslateX(10); // Adjust X position as needed
 //        hud.setTranslateY(10); // Adjust Y position as needed
@@ -68,8 +68,8 @@ public class Main extends Application {
         generateEvents(gamePane, eventImage, EVENTS_COEFFICIENT);
 
         // Set up the scene with the root node
-        Scene scene = new Scene(root, WINDOW_DIMENSION_WIDTH, WINDOW_DIMENSION_HEIGHT);
-        Player player = new Player(gamePane, eventList, primaryStage);
+
+        Player player = new Player(gamePane, eventList, primaryStage, character);
         double playerStartX = WORLD_DIMENSION_WIDTH / 2;
         double playerStartY = WORLD_DIMENSION_HEIGHT / 2;
         player.getSpriteView().setX(playerStartX);

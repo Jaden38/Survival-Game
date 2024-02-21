@@ -53,7 +53,7 @@ public class Player {
     private List<Event> eventList;
     private Stage primaryStage;
 
-    public Player(Pane gamePane, List<Event> eventList, Stage primaryStage) {
+    public Player(Pane gamePane, List<Event> eventList, Stage primaryStage, Character character) {
         this.gamePane = gamePane;
         this.eventList = eventList;
         this.primaryStage = primaryStage;
@@ -61,7 +61,7 @@ public class Player {
         gamePane.getChildren().add(spriteView);
 
         // Initialize the EventHandler
-        eventHandler = new EventHandler(eventList, gamePane);
+        eventHandler = new EventHandler(eventList, gamePane, character);
 
         gamePane.setOnKeyPressed(e -> keysPressed.add(e.getCode()));
         gamePane.setOnKeyReleased(e -> keysPressed.remove(e.getCode()));
