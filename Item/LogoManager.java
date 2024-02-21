@@ -9,6 +9,7 @@ import java.util.Map;
 public class LogoManager {
     private static final Map<String, ImageView> logoMap = new HashMap<>();
 
+
     static {
         // Load logo images and associate them with names
         logoMap.put("Gold", new ImageView(new Image("/resources/Logo/gold_logo.gif")));
