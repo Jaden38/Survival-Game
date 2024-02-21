@@ -235,6 +235,9 @@ public class EventHandler {
         if (event.getEventType() instanceof Danger) {
             handleMonsterFight((Danger) event.getEventType());
         }
+        if(event.getEventType() instanceof  Resource){
+            handleResourceCollection((Resource) event.getEventType());
+        }
         gamePane.getChildren().remove(event.getImageView());
         eventList.remove(event);
     }
@@ -243,6 +246,9 @@ public class EventHandler {
         double playerXp = character.getExperience();
         double monsterXp = danger.getExperience();
         character.setExperience(playerXp + monsterXp);
+    }
+    private void handleResourceCollection(Resource resource){
+        character.playerInventory.addResource(resource);
     }
 
     public double getPlayerX() {

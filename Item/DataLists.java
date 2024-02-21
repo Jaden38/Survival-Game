@@ -5,7 +5,7 @@ import java.util.List;
 
 public class DataLists {
     // List of possible resource names
-    public static final List<String> resourceNames = Arrays.asList("Gold", "Iron", "Wood", "Food", "Water");
+    public static final List<String> resourceNames = Arrays.asList("Gold", "Iron", "Wood", "Water","Fish");
 
     // List of possible resource quantities
     public static final List<Integer> resourceQuantities = Arrays.asList(10, 20, 30, 40, 50);

@@ -1,6 +1,7 @@
 package Item;
 
 import Event.EventType;
+import javafx.beans.property.StringProperty;
 
 /**
  * Item.Resource class which contains the name and quantity of a resource

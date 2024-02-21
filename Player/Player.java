@@ -3,16 +3,27 @@ package Player;
 import Event.Event;
 import Event.EventHandler;
 import Game.*;
+import Item.LogoManager;
+import Item.Resource;
+import Item.ResourceModel;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -25,6 +36,7 @@ import static Game.Main.WINDOW_DIMENSION_WIDTH;
 
 public class Player {
     private Pane gamePane; // Reference to the gamePane for camera movement
+
 
     private final double SPEED_COEFFICIENT = 10;
     private final int spriteWidth = 64;
@@ -69,6 +81,9 @@ public class Player {
             keysPressed.add(e.getCode());
 
             // Check if the space bar is pressed to initiate the attack
+            if (e.getCode() == KeyCode.I) {
+                displayInventory(character.playerInventory);
+            }
             if (e.getCode() == KeyCode.SPACE) {
                 startAttack();
             }
@@ -123,7 +138,7 @@ public class Player {
     }
 
     private void move() {
-        if(EventHandler.isAlertDisplayed){
+        if (EventHandler.isAlertDisplayed) {
             keysPressed.clear();
             return;
         }
@@ -198,7 +213,7 @@ public class Player {
         double yStartRangeMax;
         double yEndRangeMax;
 
-        if (primaryStage.getWidth() >1100 && primaryStage.getHeight() > 760) {
+        if (primaryStage.getWidth() > 1100 && primaryStage.getHeight() > 760) {
             // Adjust max values for full-screen mode
             xStartRangeMax = 950;
             xEndRangeMax = 5100;
@@ -324,6 +339,62 @@ public class Player {
 
     public int getSpriteHeight() {
         return spriteHeight;
+    }
+
+    private void displayInventory(Inventory inventory) {
+        TableView<ResourceModel> tableView = new TableView<>();
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        // Create columns
+        TableColumn<ResourceModel, ImageView> logoColumn = new TableColumn<>("Icon");
+        logoColumn.setPrefWidth(50);
+        logoColumn.setCellValueFactory(cellData -> cellData.getValue().logoProperty());
+
+        TableColumn<ResourceModel, String> nameColumn = new TableColumn<>("Resource");
+        nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+
+        TableColumn<ResourceModel, Number> quantityColumn = new TableColumn<>("Quantity");
+        quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty());
+
+        tableView.getColumns().addAll(logoColumn, nameColumn, quantityColumn);
+
+        // Populate data
+        ObservableList<ResourceModel> data = FXCollections.observableArrayList();
+        for (Resource resource : inventory.getResources()) {
+            ImageView logoView = LogoManager.getLogo(resource.getName());
+            if (logoView != null) {
+                double aspectRatio = logoView.getImage().getHeight() / logoView.getImage().getWidth();
+                double height = 32 * aspectRatio;
+                logoView.setFitWidth(32);
+                logoView.setFitHeight(height);
+            }
+            data.add(new ResourceModel(resource, logoView));
+        }
+        tableView.setItems(data);
+
+        // Customize TableView appearance
+        tableView.setMinSize(400, 300);
+        tableView.getStyleClass().add("inventory-table");
+
+        // Create a label for the title
+        Label titleLabel = new Label("Inventory");
+        titleLabel.setFont(Font.font("Arial", 20));
+        titleLabel.setTextFill(Color.DARKBLUE);
+
+        // Create a new pane to contain the inventory display
+        VBox inventoryDisplayPane = new VBox();
+        inventoryDisplayPane.setPadding(new Insets(10));
+        inventoryDisplayPane.setSpacing(10);
+        inventoryDisplayPane.getChildren().addAll(titleLabel, tableView);
+        inventoryDisplayPane.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+
+        // Create a new window to display the inventory
+        Stage inventoryStage = new Stage();
+        inventoryStage.setTitle("Inventory");
+        Scene scene = new Scene(inventoryDisplayPane); // No need to set initial size
+        scene.getStylesheets().add(getClass().getResource("inventory.css").toExternalForm()); // Load external CSS file for styling
+        inventoryStage.setScene(scene);
+        inventoryStage.show();
     }
 
 }

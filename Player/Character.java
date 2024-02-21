@@ -3,6 +3,9 @@ package Player;
 import Item.Danger;
 import Item.Resource;
 import Item.Tool;
+import Player.Inventory;
+
+import java.util.Arrays;
 
 /**
  * Character class describes the components of a character in the game.
@@ -41,7 +44,7 @@ public class Character {
     /**
      * character resources
      */
-    private Resource[] resources;
+    public Inventory playerInventory;
 
 
     /**
@@ -61,12 +64,13 @@ public class Character {
                      int health,
                      int hunger,
                      int thirst) {
-        this.level=1;
-        this.experience=0;
+        this.level = 1;
+        this.experience = 0;
         this.name = name;
         this.health = health;
         this.hunger = hunger;
         this.thirst = thirst;
+        this.playerInventory = new Inventory();
     }
 
     // Getters and setters
@@ -90,9 +94,6 @@ public class Character {
         return tools;
     }
 
-    public Resource[] getResources() {
-        return resources;
-    }
 
     public void setName(String name) {
         this.name = name;
@@ -124,10 +125,6 @@ public class Character {
 
     public void setTools(Tool[] tools) {
         this.tools = tools;
-    }
-
-    public void setResources(Resource[] resources) {
-        this.resources = resources;
     }
 
 
@@ -177,15 +174,21 @@ public class Character {
         this.experience = experience;
     }
 
+
     /**
      * Display the character's status
      */
+    @Override
     public String toString() {
-        return "Name: " + name + "\n" +
-                "Health: " + health + "\n" +
-                "Hunger: " + hunger + "\n" +
-                "Thirst: " + thirst + "\n" +
-                "Tools: " + tools + "\n" +
-                "Resources: " + resources;
+        return "Character{" +
+                "level=" + level +
+                ", experience=" + experience +
+                ", name='" + name + '\'' +
+                ", health=" + health +
+                ", hunger=" + hunger +
+                ", thirst=" + thirst +
+                ", tools=" + Arrays.toString(tools) +
+                ", playerInventory=" + playerInventory.toString() +
+                '}';
     }
 }

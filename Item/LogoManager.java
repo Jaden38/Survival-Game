@@ -13,10 +13,10 @@ public class LogoManager {
     static {
         // Load logo images and associate them with names
         logoMap.put("Gold", new ImageView(new Image("/resources/Logo/gold_logo.gif")));
-//        logoMap.put("Iron", new ImageView(new Image("/resources/Logo/iron_logo.gif")));
+        logoMap.put("Iron", new ImageView(new Image("/resources/Logo/iron_logo.gif")));
         logoMap.put("Wood", new ImageView(new Image("/resources/Logo/wood_logo.gif")));
-//        logoMap.put("Food", new ImageView(new Image("/resources/Logo/food_logo.gif")));
-//        logoMap.put("Water", new ImageView(new Image("/resources/Logo/water_logo.gif")));
+        logoMap.put("Fish", new ImageView(new Image("/resources/Logo/fish_logo.gif")));
+        logoMap.put("Water", new ImageView(new Image("/resources/Logo/water_logo.gif")));
         // Add logos for danger names if needed
         logoMap.put("Dragon", new ImageView(new Image("/resources/Logo/dragon_logo.gif")));
         logoMap.put("Goblin", new ImageView(new Image("/resources/Logo/goblin_logo.gif")));
