@@ -36,8 +36,6 @@ import static Game.Main.WINDOW_DIMENSION_WIDTH;
 
 public class Player {
     private Pane gamePane; // Reference to the gamePane for camera movement
-
-
     private final double SPEED_COEFFICIENT = 10;
     private final int spriteWidth = 64;
     private final int spriteHeight = 64;
@@ -63,12 +61,14 @@ public class Player {
 
     private EventHandler eventHandler; // Single instance of EventHandler
     private List<Event> eventList;
-    private Stage primaryStage;
+    public Stage primaryStage;
+    private Character character;
 
     public Player(Pane gamePane, List<Event> eventList, Stage primaryStage, Character character) {
         this.gamePane = gamePane;
         this.eventList = eventList;
         this.primaryStage = primaryStage;
+        this.character = character;
         setupPlayer();
         gamePane.getChildren().add(spriteView);
 
@@ -138,7 +138,7 @@ public class Player {
     }
 
     private void move() {
-        if (EventHandler.isAlertDisplayed) {
+        if (EventHandler.isAlertDisplayed || character.isDead) {
             keysPressed.clear();
             return;
         }

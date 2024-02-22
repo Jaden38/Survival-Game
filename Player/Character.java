@@ -1,11 +1,13 @@
 package Player;
 
+import Interface.CharacterObserver;
 import Item.Danger;
 import Item.Resource;
 import Item.Tool;
-import Player.Inventory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Character class describes the components of a character in the game.
@@ -46,6 +48,9 @@ public class Character {
      */
     public Inventory playerInventory;
 
+    private List<CharacterObserver> observers;
+
+    public boolean isDead=false;
 
     /**
      * Constructor for Character class
@@ -71,6 +76,7 @@ public class Character {
         this.hunger = hunger;
         this.thirst = thirst;
         this.playerInventory = new Inventory();
+        observers = new ArrayList<>();
     }
 
     // Getters and setters
@@ -99,27 +105,54 @@ public class Character {
         this.name = name;
     }
 
-    public void setHealth(int health) {
-        if (health < 0) {
-            System.out.println("Health can't be negative.");
-        } else {
-            this.health = health;
-        }
-    }
 
-    public void setHunger(int hunger) {
-        if (hunger < 0) {
-            System.out.println("Hunger can't be negative.");
-        } else {
-            this.hunger = hunger;
+
+    public void setHealth(int health) {
+        this.health = health;
+        if (health <= 0) {
+            this.health=0;
         }
     }
 
     public void setThirst(int thirst) {
-        if (thirst < 0) {
-            System.out.println("Thirst can't be negative.");
-        } else {
-            this.thirst = thirst;
+        this.thirst = thirst;
+        if (thirst <= 0) {
+            this.thirst=0;
+            notifyThirstObservers();
+        }
+    }
+
+    public void setHunger(int hunger) {
+        this.hunger = hunger;
+        if (hunger <= 0) {
+            this.hunger=0;
+            notifyHungerObservers();
+        }
+    }
+
+    public void addObserver(CharacterObserver observer) {
+        observers.add(observer);
+    }
+
+    public void removeObserver(CharacterObserver observer) {
+        observers.remove(observer);
+    }
+
+    private void notifyHealthObservers() {
+        for (CharacterObserver observer : observers) {
+            observer.onHealthZero();
+        }
+    }
+
+    private void notifyThirstObservers() {
+        for (CharacterObserver observer : observers) {
+            observer.onThirstZero();
+        }
+    }
+
+    private void notifyHungerObservers() {
+        for (CharacterObserver observer : observers) {
+            observer.onHungerZero();
         }
     }
 
@@ -174,6 +207,27 @@ public class Character {
         this.experience = experience;
     }
 
+    public void decreaseHealth(int amount){
+        int newHealth = health - amount;
+        if (newHealth <= 0) {
+            notifyHealthObservers();
+        }
+        setHealth(newHealth);
+    }
+    public void decreaseHunger(int amount) {
+        int newHunger = hunger - amount;
+        if (newHunger <= 0) {
+          notifyHungerObservers();
+        }
+        setHunger(newHunger);
+    }
+    public void decreaseThirst(int amount) {
+        int newThirst = thirst - amount;
+        if (newThirst <= 0) {
+            notifyThirstObservers();
+        }
+        setThirst(newThirst);
+    }
 
     /**
      * Display the character's status

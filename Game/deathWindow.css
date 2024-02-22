@@ -1,0 +1,39 @@
+.alert {
+    -fx-background-color: rgba(51, 51, 51, 0.9); /* Semi-transparent dark background */
+    -fx-border-color: rgba(102, 102, 102, 0.9); /* Semi-transparent border color */
+    -fx-border-width: 2px;
+    -fx-pref-width: 400px; /* Set preferred width */
+    -fx-pref-height: 200px; /* Set preferred height */
+    -fx-alignment: center; /* Center the content */
+}
+
+.alert .header-panel {
+    -fx-background-color: rgba(102, 102, 102, 0.9); /* Semi-transparent header background */
+    -fx-border-color: rgba(153, 153, 153, 0.9); /* Semi-transparent border color */
+    -fx-border-width: 0 0 1 0;
+}
+
+.alert .content-panel {
+    -fx-background-color: rgba(51, 51, 51, 0.9); /* Semi-transparent dark background */
+}
+
+.alert .button-bar {
+    -fx-background-color: rgba(102, 102, 102, 0.9); /* Semi-transparent button bar background */
+}
+
+.alert .button-bar .button {
+    -fx-background-color: rgba(68, 68, 68, 0.9); /* Semi-transparent button background */
+    -fx-text-fill: white;
+}
+
+.alert .button-bar .button:hover {
+    -fx-background-color: rgba(85, 85, 85, 0.9); /* Semi-transparent button hover background */
+}
+
+.alert .button-bar .button:pressed {
+    -fx-background-color: rgba(51, 51, 51, 0.9); /* Semi-transparent button pressed background */
+}
+
+.dialog-pane .label {
+    -fx-text-fill: white; /* Text color of labels inside the dialog pane */
+}

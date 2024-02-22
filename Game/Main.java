@@ -43,7 +43,7 @@ public class Main extends Application {
         root.getChildren().add(gamePane);
         Scene scene = new Scene(root, WINDOW_DIMENSION_WIDTH, WINDOW_DIMENSION_HEIGHT);
         // Create the character and HUD
-        Character character = new Character("Player", 1000, 50, 100);
+        Character character = new Character("Player", 100, 50, 100);
         HUD hud = new HUD(character, scene);
 //        hud.setPrefWidth(200); // Adjust width as needed
 //        hud.setTranslateX(10); // Adjust X position as needed
@@ -70,6 +70,9 @@ public class Main extends Application {
         // Set up the scene with the root node
 
         Player player = new Player(gamePane, eventList, primaryStage, character);
+
+        hud.setRoot(root);
+
         double playerStartX = WORLD_DIMENSION_WIDTH / 2;
         double playerStartY = WORLD_DIMENSION_HEIGHT / 2;
         player.getSpriteView().setX(playerStartX);
@@ -87,6 +90,17 @@ public class Main extends Application {
         // Add listeners to handle stage size changes when going fullscreen
         primaryStage.widthProperty().addListener((observable, oldWidth, newWidth) -> player.updateCameraPosition());
         primaryStage.heightProperty().addListener((observable, oldHeight, newHeight) -> player.updateCameraPosition());
+
+        hud.isRestartingProperty.addListener((obs, oldValue, newValue) -> {
+            if (newValue) {
+                // Clean events
+                cleanEvents();
+                // Generate events again
+                generateEvents(gamePane, eventImage, EVENTS_COEFFICIENT);
+                // Reset the isRestartingProperty to false
+                hud.isRestartingProperty.set(false);
+            }
+        });
     }
 
 
@@ -144,5 +158,14 @@ public class Main extends Application {
         }
 
     }
+    public void cleanEvents() {
+        // Remove all event-related ImageViews from the game pane
+        for (Event event : eventList) {
+            gamePane.getChildren().remove(event.getImageView());
+        }
+        // Clear the event list
+        eventList.clear();
+    }
+
 
 }

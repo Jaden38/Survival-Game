@@ -1,24 +1,31 @@
 package Game;
 
+import Interface.CharacterObserver;
 import Player.Character;
-import javafx.animation.AnimationTimer;
+import Player.Player;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class HUD extends BorderPane {
-    private int MAX_EXPERIENCE=300;
+public class HUD extends BorderPane implements CharacterObserver {
+
+    private int MAX_EXPERIENCE = 300;
     private Character character;
     private Scene scene;
     private GameTime gameTime;
@@ -37,7 +44,9 @@ public class HUD extends BorderPane {
     private Label thirstLabelValue;
     private Label timeLabel;
     private ScheduledExecutorService scheduler;
-
+    private StackPane root;
+   private AtomicInteger counter;
+    public BooleanProperty isRestartingProperty = new SimpleBooleanProperty(false);
 
     public HUD(Character character, Scene scene) {
         this.character = character;
@@ -48,6 +57,7 @@ public class HUD extends BorderPane {
         setLabelsStyle();
         setLayout();
         startTimerAsync();
+        character.addObserver(this);
 
     }
 
@@ -59,7 +69,7 @@ public class HUD extends BorderPane {
         thirstLabelPrefix = new Label();
         timeLabel = new Label();
 
-        levelLabelValue= new Label();
+        levelLabelValue = new Label();
         nameLabelValue = new Label();
         healthLabelValue = new Label();
         hungerLabelValue = new Label();
@@ -156,7 +166,7 @@ public class HUD extends BorderPane {
         // Add spacing between the groups
         int groupSpacing = 20;
 
-        HBox nameAndDataBox = new HBox(levelBox,  new Pane(), nameBox, new Pane(), healthBox, new Pane(), hungerBox, new Pane(), thirstBox);
+        HBox nameAndDataBox = new HBox(levelBox, new Pane(), nameBox, new Pane(), healthBox, new Pane(), hungerBox, new Pane(), thirstBox);
         nameAndDataBox.setPadding(new Insets(10));
         nameAndDataBox.setSpacing(groupSpacing);
 
@@ -192,14 +202,29 @@ public class HUD extends BorderPane {
 
     private void startTimerAsync() {
         scheduler = Executors.newSingleThreadScheduledExecutor();
+        counter = new AtomicInteger(0);
         scheduler.scheduleAtFixedRate(() -> {
             // This runs in a separate thread asynchronously
             Platform.runLater(() -> {
                 gameTime.updateTime();
                 updateLabels();
+
+                // Increment the counter
+                counter.incrementAndGet();
+
+                // Check if the counter reaches a threshold (e.g., every 1 hours)
+                if (counter.get() == 60) {
+                    character.decreaseHunger(1); // Decrease hunger by 1
+                    character.decreaseThirst(1); // Decrease thirst by 1
+                    updateLabels();
+
+                    // Reset the counter
+                    counter.set(0);
+                }
             });
-        }, 0, 300, TimeUnit.MILLISECONDS); // Update timer every 60 seconds
+        }, 0, 300, TimeUnit.MILLISECONDS);
     }
+
 
     private void handleXPBar() {
         // Check if XP bar is full
@@ -214,4 +239,91 @@ public class HUD extends BorderPane {
             updateLabels();
         }
     }
+
+    @Override
+    public void onHealthZero() {
+        character.setHealth(0);
+        updateLabels();
+        character.isDead = true;
+        scheduler.shutdown();
+
+        // Create a custom pane for displaying death information
+        VBox deathPane = new VBox();
+        deathPane.setAlignment(Pos.CENTER);
+        deathPane.setSpacing(10);
+        deathPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8); -fx-padding: 20;");
+
+        Label gameOverLabel = new Label("Game Over!");
+        gameOverLabel.setTextFill(Color.RED);
+        gameOverLabel.setStyle("-fx-font-size: 36px;");
+
+        Label deathLabel = new Label("You survived for " + gameTime.getTimeString());
+        deathLabel.setTextFill(Color.WHITE);
+
+        HBox buttonBox = new HBox();
+        buttonBox.setAlignment(Pos.CENTER); // Aligning the buttonBox to the center
+        buttonBox.setSpacing(10); // Adding spacing between buttons
+        buttonBox.setPadding(new Insets(10, 0, 0, 0)); // Adding padding to move the buttonBox a bit lower
+        Button quitButton = new Button("Quit Game");
+        Button restartButton = new Button("Restart Game");
+        quitButton.setStyle("-fx-background-color: #c0392b; -fx-text-fill: white; -fx-font-size: 14px;");
+        restartButton.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 14px;");
+
+        buttonBox.getChildren().addAll(quitButton, restartButton);
+
+        // Add actions to buttons
+        quitButton.setOnAction(event -> Platform.exit());
+        restartButton.setOnAction(event -> {
+            isRestartingProperty.set(true);
+            character.isDead=false;
+            restart();
+            root.getChildren().remove(deathPane);
+        });
+
+        deathPane.getChildren().addAll(gameOverLabel, deathLabel, buttonBox);
+
+        // Add the death pane to the root StackPane
+        root.getChildren().add(deathPane);
+    }
+
+
+
+    @Override
+    public void onThirstZero() {
+        // Implement behavior when thirst reaches zero
+    }
+
+    @Override
+    public void onHungerZero() {
+        // Implement behavior when hunger reaches zero
+    }
+    void restart() {
+        cleanup();
+    }
+    void cleanup() {
+        character.setHealth(100);
+        character.setHunger(50);
+        character.setThirst(100);
+        character.setLevel(1);
+        character.setExperience(0);
+        character.playerInventory.cleanInventory();
+
+        // Reset the timer counter
+        counter.set(0);
+
+        updateLabels();
+
+        // Shutdown the existing scheduler if it's running
+        if (scheduler != null && !scheduler.isShutdown()) {
+            scheduler.shutdown();
+        }
+
+        // Start a new timer
+        startTimerAsync();
+    }
+
+    public void setRoot(StackPane root) {
+        this.root = root;
+    }
+
 }

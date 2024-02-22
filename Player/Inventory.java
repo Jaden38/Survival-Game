@@ -66,7 +66,9 @@ public class Inventory {
         }
         return false;
     }
-
+    public void cleanInventory() {
+        resources.clear();
+    }
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

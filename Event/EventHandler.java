@@ -57,32 +57,34 @@ public class EventHandler {
         // Get the current time
         long currentTime = System.currentTimeMillis();
 
-        // Check if the player is close to any event
-        for (Event event : eventList) {
-            double eventX = event.getX();
-            double eventY = event.getY();
+        if (!character.isDead) {
+            for (Event event : eventList) {
+                double eventX = event.getX();
+                double eventY = event.getY();
 
-            // Calculate the distance between the player and the event
-            double distance = Math.sqrt(Math.pow(playerX - eventX + 55, 2) + Math.pow(playerY - eventY + 45, 2));
+                // Calculate the distance between the player and the event
+                double distance = Math.sqrt(Math.pow(playerX - eventX + 55, 2) + Math.pow(playerY - eventY + 45, 2));
 
-            // Check if the distance is less than the threshold
-            if (distance < threshold) {
-                // Check if this event is different from the last one encountered
-                if (!event.equals(lastEventEncountered)) {
-                    // Show a message window containing the event information
-                    showEventMessage(event);
-                    lastEventEncountered = event; // Update the last event encountered
-                    lastEventTime = currentTime; // Update the timestamp
-                } else {
-                    // Check if enough time has passed since the last event encounter
-                    if (currentTime - lastEventTime >= EVENT_COOLDOWN) {
+                // Check if the distance is less than the threshold
+                if (distance < threshold) {
+                    // Check if this event is different from the last one encountered
+                    if (!event.equals(lastEventEncountered)) {
                         // Show a message window containing the event information
                         showEventMessage(event);
+                        lastEventEncountered = event; // Update the last event encountered
                         lastEventTime = currentTime; // Update the timestamp
+                    } else {
+                        // Check if enough time has passed since the last event encounter
+                        if (currentTime - lastEventTime >= EVENT_COOLDOWN) {
+                            // Show a message window containing the event information
+                            showEventMessage(event);
+                            lastEventTime = currentTime; // Update the timestamp
+                        }
                     }
+                    return; // Exit the loop after encountering an event
                 }
-                return; // Exit the loop after encountering an event
             }
+
         }
     }
 
@@ -235,7 +237,7 @@ public class EventHandler {
         if (event.getEventType() instanceof Danger) {
             handleMonsterFight((Danger) event.getEventType());
         }
-        if(event.getEventType() instanceof  Resource){
+        if (event.getEventType() instanceof Resource) {
             handleResourceCollection((Resource) event.getEventType());
         }
         gamePane.getChildren().remove(event.getImageView());
@@ -243,11 +245,13 @@ public class EventHandler {
     }
 
     private void handleMonsterFight(Danger danger) {
+        character.decreaseHealth(danger.getDamage());
         double playerXp = character.getExperience();
         double monsterXp = danger.getExperience();
         character.setExperience(playerXp + monsterXp);
     }
-    private void handleResourceCollection(Resource resource){
+
+    private void handleResourceCollection(Resource resource) {
         character.playerInventory.addResource(resource);
     }
 
