@@ -177,7 +177,7 @@ public class HUD extends BorderPane implements CharacterObserver {
         Region filler = new Region();
         HBox.setHgrow(filler, Priority.ALWAYS);
         HBox topBox = new HBox(nameAndDataBox, filler, timerBox);
-        topBox.setStyle("-fx-background-color: rgba(0, 0, 0, 0.4); -fx-border-color: white; -fx-border-width: 0 0 2 0;");
+        topBox.setStyle("-fx-background-color: rgba(0, 0, 0, 1); -fx-border-color: white; -fx-border-width: 0 0 2 0;");
         topBox.setPadding(new Insets(10));
         topBox.setSpacing(groupSpacing);
         topBox.setAlignment(Pos.CENTER_LEFT);
