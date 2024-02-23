@@ -308,9 +308,6 @@ public class HUD extends BorderPane implements CharacterObserver {
         character.setExperience(0);
         character.playerInventory.cleanInventory();
 
-        // Reset the timer counter
-        counter.set(0);
-
         updateLabels();
 
         // Shutdown the existing scheduler if it's running
@@ -319,6 +316,7 @@ public class HUD extends BorderPane implements CharacterObserver {
         }
 
         // Start a new timer
+        gameTime=new GameTime();
         startTimerAsync();
     }
 

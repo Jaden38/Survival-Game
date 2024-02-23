@@ -50,7 +50,8 @@ public class Character {
 
     private List<CharacterObserver> observers;
 
-    public boolean isDead=false;
+    public Player player;
+    public boolean isDead = false;
 
     /**
      * Constructor for Character class
@@ -106,18 +107,17 @@ public class Character {
     }
 
 
-
     public void setHealth(int health) {
         this.health = health;
         if (health <= 0) {
-            this.health=0;
+            this.health = 0;
         }
     }
 
     public void setThirst(int thirst) {
         this.thirst = thirst;
         if (thirst <= 0) {
-            this.thirst=0;
+            this.thirst = 0;
             notifyThirstObservers();
         }
     }
@@ -125,7 +125,7 @@ public class Character {
     public void setHunger(int hunger) {
         this.hunger = hunger;
         if (hunger <= 0) {
-            this.hunger=0;
+            this.hunger = 0;
             notifyHungerObservers();
         }
     }
@@ -207,26 +207,32 @@ public class Character {
         this.experience = experience;
     }
 
-    public void decreaseHealth(int amount){
+    public void decreaseHealth(int amount) {
         int newHealth = health - amount;
         if (newHealth <= 0) {
             notifyHealthObservers();
         }
         setHealth(newHealth);
     }
+
     public void decreaseHunger(int amount) {
         int newHunger = hunger - amount;
         if (newHunger <= 0) {
-          notifyHungerObservers();
+            notifyHungerObservers();
         }
         setHunger(newHunger);
     }
+
     public void decreaseThirst(int amount) {
         int newThirst = thirst - amount;
         if (newThirst <= 0) {
             notifyThirstObservers();
         }
         setThirst(newThirst);
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
     /**

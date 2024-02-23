@@ -14,7 +14,9 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 import java.util.List;
@@ -36,11 +38,12 @@ public class EventHandler {
     private static final long EVENT_COOLDOWN = 5000; // Cooldown time in milliseconds (5 seconds)
     public static boolean isAlertDisplayed = false;
     private Pane gamePane;
-
+    private StackPane root;
 
     // Constructor
 
-    public EventHandler(List<Event> eventList, Pane gamePane, Character character, ImageView player) {
+    public EventHandler(StackPane root, List<Event> eventList, Pane gamePane, Character character, ImageView player) {
+        this.root = root;
         this.eventList = eventList;
         this.gamePane = gamePane;
         this.character = character;
@@ -88,6 +91,38 @@ public class EventHandler {
         }
     }
 
+//    private void showEventMessage(Event event) {
+//        VBox deathPane = new VBox();
+//        deathPane.setAlignment(Pos.CENTER);
+//        deathPane.setSpacing(10);
+//
+//        Label gameOverLabel = new Label("Game Over!");
+//        gameOverLabel.setTextFill(Color.RED);
+//        gameOverLabel.setStyle("-fx-font-size: 36px;");
+//
+//
+//        HBox buttonBox = new HBox();
+//        buttonBox.setAlignment(Pos.CENTER); // Aligning the buttonBox to the center
+//        buttonBox.setSpacing(10); // Adding spacing between buttons
+//        buttonBox.setPadding(new Insets(10, 0, 0, 0)); // Adding padding to move the buttonBox a bit lower
+//        Button quitButton = new Button("Quit Game");
+//        Button restartButton = new Button("Restart Game");
+//        quitButton.setStyle("-fx-background-color: #c0392b; -fx-text-fill: white; -fx-font-size: 14px;");
+//        restartButton.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 14px;");
+//
+//        buttonBox.getChildren().addAll(quitButton, restartButton);
+//
+//        // Add actions to buttons
+//        quitButton.setOnAction(eventKey -> Platform.exit());
+//        restartButton.setOnAction(eventKey -> {
+//            root.getChildren().remove(deathPane);
+//        });
+//
+//        deathPane.getChildren().addAll(gameOverLabel, buttonBox);
+//
+//        // Add the death pane to the root StackPane
+//        root.getChildren().add(deathPane);
+//    }
     private void showEventMessage(Event event) {
         isAlertDisplayed = true;
         Platform.runLater(() -> {

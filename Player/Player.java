@@ -30,9 +30,13 @@ import javafx.util.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
-import static Game.Main.WINDOW_DIMENSION_HEIGHT;
-import static Game.Main.WINDOW_DIMENSION_WIDTH;
+
+import Game.Main.*;
+
+import static Game.Main.WORLD_DIMENSION_HEIGHT;
+import static Game.Main.WORLD_DIMENSION_WIDTH;
 
 public class Player {
     private Pane gamePane; // Reference to the gamePane for camera movement
@@ -63,24 +67,27 @@ public class Player {
     private List<Event> eventList;
     public Stage primaryStage;
     private Character character;
+    private StackPane root;
+    private HUD hud;
 
-    public Player(Pane gamePane, List<Event> eventList, Stage primaryStage, Character character) {
+    public Player(StackPane root, Pane gamePane, List<Event> eventList, Stage primaryStage, Character character, HUD hud) {
+        this.root = root;
         this.gamePane = gamePane;
         this.eventList = eventList;
         this.primaryStage = primaryStage;
         this.character = character;
+        this.hud = hud;
         setupPlayer();
         gamePane.getChildren().add(spriteView);
 
         // Initialize the EventHandler
-        eventHandler = new EventHandler(eventList, gamePane, character, getSpriteView());
+        eventHandler = new EventHandler(root, eventList, gamePane, character, getSpriteView());
 
         gamePane.setOnKeyPressed(e -> keysPressed.add(e.getCode()));
         gamePane.setOnKeyReleased(e -> keysPressed.remove(e.getCode()));
         gamePane.setOnKeyPressed(e -> {
             keysPressed.add(e.getCode());
 
-            // Check if the space bar is pressed to initiate the attack
             if (e.getCode() == KeyCode.I) {
                 displayInventory(character.playerInventory);
             }
@@ -106,7 +113,7 @@ public class Player {
         }.start();
     }
 
-    private void setupPlayer() {
+    public void setupPlayer() {
 
         spritesheet = new Image(FRONT_MOVEMENT);
 
@@ -138,6 +145,7 @@ public class Player {
     }
 
     private void move() {
+
         if (EventHandler.isAlertDisplayed || character.isDead) {
             keysPressed.clear();
             return;
@@ -397,4 +405,25 @@ public class Player {
         inventoryStage.show();
     }
 
+    public void resetPlayer() {
+        // Reset player position
+        double initialX = WORLD_DIMENSION_WIDTH / 2; // Set initial X position
+        double initialY = WORLD_DIMENSION_HEIGHT / 2; // Set initial Y position
+        spriteView.setX(initialX);
+        spriteView.setY(initialY);
+
+        // Reset player orientation and movement state
+        lastOrientation = 0;
+        isMoving = false;
+        isAttacking = false;
+        currentFrame = 0;
+
+        // Reset keys pressed
+        keysPressed.clear();
+
+        // Reset spritesheet to default
+        currentSpritesheet = FRONT_MOVEMENT;
+        spritesheet = new Image(FRONT_MOVEMENT);
+        setupSpriteView();
+    }
 }

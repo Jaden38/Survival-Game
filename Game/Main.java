@@ -27,12 +27,13 @@ import java.util.Random;
 public class Main extends Application {
     public static final int WINDOW_DIMENSION_WIDTH = 1080;
     public static final int WINDOW_DIMENSION_HEIGHT = 720;
-    private final int WORLD_DIMENSION_WIDTH = 2560;
-    private final int WORLD_DIMENSION_HEIGHT = 2048;
+    public static final int WORLD_DIMENSION_WIDTH = 2560;
+    public static final int WORLD_DIMENSION_HEIGHT = 2048;
     private final int PERLIN_NOISE_SEED = 100;
     private final double EVENTS_COEFFICIENT = 0.00003;
     public Pane gamePane;
     private List<Event> eventList = new ArrayList<>();
+
 
     @Override
     public void start(Stage primaryStage) {
@@ -43,7 +44,7 @@ public class Main extends Application {
         root.getChildren().add(gamePane);
         Scene scene = new Scene(root, WINDOW_DIMENSION_WIDTH, WINDOW_DIMENSION_HEIGHT);
         // Create the character and HUD
-        Character character = new Character("Player", 100, 50, 100);
+        Character character = new Character("Player", 1000, 50, 100);
         HUD hud = new HUD(character, scene);
 //        hud.setPrefWidth(200); // Adjust width as needed
 //        hud.setTranslateX(10); // Adjust X position as needed
@@ -69,7 +70,8 @@ public class Main extends Application {
 
         // Set up the scene with the root node
 
-        Player player = new Player(gamePane, eventList, primaryStage, character);
+        Player player = new Player(root, gamePane, eventList, primaryStage, character, hud);
+        character.setPlayer(player);
 
         hud.setRoot(root);
 
@@ -98,6 +100,8 @@ public class Main extends Application {
                 // Generate events again
                 generateEvents(gamePane, eventImage, EVENTS_COEFFICIENT);
                 // Reset the isRestartingProperty to false
+                player.resetPlayer();
+                gamePane.requestFocus();
                 hud.isRestartingProperty.set(false);
             }
         });
@@ -158,6 +162,7 @@ public class Main extends Application {
         }
 
     }
+
     public void cleanEvents() {
         // Remove all event-related ImageViews from the game pane
         for (Event event : eventList) {
